@@ -1,7 +1,7 @@
 services:
   mysql:
     image: mysql:8.4
-    container_name: mysqlschool
+    container_name: mysqldevops
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: db-school
@@ -18,7 +18,7 @@ services:
 
   backend:
     build: .
-    container_name: schoolops
+    container_name: schooldevops
     restart: unless-stopped
     depends_on:
       mysql:
