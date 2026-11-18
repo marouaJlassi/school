@@ -1,0 +1,16 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9091"]
+
+  - job_name: spring-backend
+    metrics_path: /school/actuator/prometheus
+    static_configs:
+      - targets: ["backend:8089"]
+
+  - job_name: mysql
+    static_configs:
+      - targets: ["mysqld-exporter:9104"]
