@@ -22,7 +22,7 @@ services:
       - mysqld-exporter
       - backend
     ports:
-      - "9091:9090"        # host 9091 -> container 9090
+      - "9092:9090"        # host 9092 -> container 9090
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheusdata:/prometheus
