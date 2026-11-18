@@ -3,5 +3,5 @@ datasources:
   - name: Prometheus
     type: prometheus
     access: proxy
-    url: http://prometheus:9091
+    url: http://prometheus:9090   # container-to-container: internal port, not the host-mapped 9091
     isDefault: true

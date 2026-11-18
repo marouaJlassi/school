@@ -1,3 +1,6 @@
+# Usage (always together with the main file, from the project root):
+#   docker compose -f docker-compose.yml -f monitoring/docker-compose-monitoring.yml up -d
+# Relative paths below are resolved from the folder of the FIRST -f file (project root).
 services:
   mysqld-exporter:
     image: prom/mysqld-exporter:latest
@@ -19,15 +22,17 @@ services:
       - mysqld-exporter
       - backend
     ports:
-      - "9091:9090"
+      - "9091:9090"        # host 9091 -> container 9090
     volumes:
-      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheusdata:/prometheus
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:9091/-/healthy || exit 1"]
+      # healthchecks run INSIDE the container -> use the container port (9090)
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9090/-/healthy || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 10
+      start_period: 10s
 
   grafana:
     image: grafana/grafana:latest
@@ -40,15 +45,17 @@ services:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: admin
     ports:
-      - "3001:3000"
+      - "3001:3000"        # host 3001 -> container 3000
     volumes:
       - grafanadata:/var/lib/grafana
-      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      # Grafana only auto-loads datasources from provisioning/datasources/
+      - ./monitoring/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml:ro
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:3001/api/health || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/api/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 10
+      start_period: 20s
 
 volumes:
   prometheusdata:

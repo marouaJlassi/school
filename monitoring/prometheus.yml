@@ -2,10 +2,12 @@ global:
   scrape_interval: 15s
 
 scrape_configs:
+  # Prometheus scraping itself: inside its own container it listens on 9090
   - job_name: prometheus
     static_configs:
-      - targets: ["localhost:9091"]
+      - targets: ["localhost:9090"]
 
+  # Spring Boot app: container port 8089 + context-path /school
   - job_name: spring-backend
     metrics_path: /school/actuator/prometheus
     static_configs:
