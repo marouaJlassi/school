@@ -18,13 +18,8 @@ STAGES = [
     ("Docker Push", "🚀", "Publie l'image sur Docker Hub."),
     ("Docker Compose", "🧩", "Lance les conteneurs."),
     ("Deploy to Kubernetes", "☸️", "Déploie sur Minikube."),
-    ("Monitoring with Grafana Prometheus", "📈", "Prometheus, Grafana et mysqld-exporter (cibles backend + MySQL)."),
+    ("Monitoring with Grafana Prometheus", "📈", "Prometheus, Grafana et cAdvisor."),
 ]
-
-ALIASES = {
-    "Tests Unitaires + Coverage": ["Tests + Coverage"],
-    "Monitoring with Grafana Prometheus": ["Monitoring (Prometheus + Grafana)"],
-}
 
 ST = {
     "SUCCESS": ("Réussi", "ok"), "FAILED": ("Échoué", "ko"),
@@ -82,32 +77,18 @@ def trivy(path):
     return run
 
 def sonar():
-    url = os.getenv("SONAR_URL", "http://127.0.0.1:9000/").rstrip("/")
-    key = os.getenv("SONAR_KEY", "school-backend")
-    return (f"<p><a class='btn' target='_blank' "
-            f"href='{E(url)}/dashboard?id={E(key)}'>Ouvrir SonarQube</a></p>")
+    return ("<p><a class='btn' target='_blank' "
+            "href='http://127.0.0.1:9000/dashboard?id=devopsbackend'>Ouvrir SonarQube</a></p>")
 
 def jacoco():
     base = os.getenv("BUILD_URL", "#")
     return f"<p><a class='btn' target='_blank' href='{E(base)}JaCoCo_Coverage/'>Ouvrir JaCoCo</a></p>"
-
-def monitoring():
-    host = os.getenv("MONITORING_HOST", "127.0.0.1")
-    links = [
-        ("Prometheus", f"http://{host}:9091/targets"),
-        ("Grafana", f"http://{host}:3001"),
-        ("Actuator Prometheus", f"http://{host}:8089/school/actuator/prometheus"),
-        ("Swagger UI", f"http://{host}:8089/school/swagger-ui/index.html"),
-    ]
-    btns = " ".join(f"<a class='btn' target='_blank' href='{E(u)}'>{E(n)}</a>" for n, u in links)
-    return f"<p>{btns}</p>"
 
 DET = {
     "Trivy FS Scan": trivy("trivy-report.json"),
     "Trivy Image Scan": trivy("trivy-image-report.json"),
     "SonarQube Analysis": sonar,
     "Tests Unitaires + Coverage": jacoco,
-    "Monitoring with Grafana Prometheus": monitoring,
 }
 
 CSS = """
@@ -139,7 +120,7 @@ jobs = get_stages()
 total = {"ok": 0, "ko": 0, "other": 0}
 sections = ""
 for name, icon, desc in STAGES:
-    job = jobs.get(name) or next((jobs[a] for a in ALIASES.get(name, []) if a in jobs), None)
+    job = jobs.get(name)
     label, cls = ST.get(job.get("status"), ("Inconnu", "mute")) if job else ("Non trouvé", "mute")
     total[cls if cls in ("ok", "ko") else "other"] += 1
     facts = f"Stage : <code>{E(name)}</code>"
