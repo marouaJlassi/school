@@ -18,7 +18,7 @@ services:
       start_period: 60s
 
   backend:
-    image: ${DOCKER_USER}/school-backend:latest   # ou school-backend:latest si local
+    image: maroua256/school-backend:latest   # ou school-backend:latest si local
     container_name: schooldevops
     restart: unless-stopped
     depends_on:
