@@ -1,7 +1,6 @@
 services:
   mysql:
     image: mysql:8.4
-    container_name: mysqldevops
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: db-school
@@ -19,7 +18,6 @@ services:
 
   backend:
     image: maroua256/school-backend:latest   # ou school-backend:latest si local
-    container_name: schooldevops
     restart: unless-stopped
     depends_on:
       mysql:
